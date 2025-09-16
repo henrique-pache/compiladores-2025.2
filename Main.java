@@ -1,9 +1,14 @@
-import java.io.StringReader;
+import java.io.FileReader;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String input = "3 + 4.5 * (2 ** 3)";
-        CalcScanner scanner = new CalcScanner(new StringReader(input));
-        scanner.yylex();  // imprime tokens no console
+        FileReader reader = new FileReader("entrada.txt");
+        CalcScanner scanner = new CalcScanner(reader);
+
+        while (!scanner.yyatEOF()) {
+            scanner.yylex();  // imprime tokens no console
+        }
+
+        reader.close();
     }
 }

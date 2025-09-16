@@ -11,6 +11,7 @@ compiladores-2025.2/
 ├── Calc.flex          # Arquivo fonte JFlex
 ├── CalcScanner.java   # Scanner gerado pelo JFlex
 ├── Main.java          # Programa principal para testar o scanner
+├── entrada.txt        # Arquivo de entrada com expressões matemáticas
 ├── java-cup-11b.jar   # Runtime do Java CUP (se necessário)
 └── README.md
 ```
@@ -25,7 +26,17 @@ compiladores-2025.2/
 
 ---
 
-## Passo 1: Gerar o scanner com JFlex
+## Passo 1: Criar o arquivo de entrada
+
+Crie um arquivo chamado `entrada.txt` no diretório do projeto com uma expressão matemática, por exemplo:
+
+```
+3 + 4.5 * (2 ** 3)
+```
+
+---
+
+## Passo 2: Gerar o scanner com JFlex
 
 ```bash
 # No diretório do projeto
@@ -38,31 +49,25 @@ Isso irá gerar o arquivo `CalcScanner.java`.
 
 ---
 
-## Passo 2: Compilar os arquivos Java
+## Passo 3: Compilar os arquivos Java
 
 ```bash
 # Compila todos os arquivos Java
 javac *.java
 ```
 
-* Isso irá gerar os `.class` correspondentes: `CalcScanner.class` e `Main.class`.
+Isso irá gerar os `.class` correspondentes: `CalcScanner.class` e `Main.class`.
 
 ---
 
-## Passo 3: Executar o programa principal
+## Passo 4: Executar o programa principal
 
 ```bash
 # Executa o programa
 java Main
 ```
 
-* Digite a expressão matemática no terminal, por exemplo:
-
-```
-3 + 4.5 * (2 ^ 3)
-```
-
-* O scanner irá imprimir os tokens reconhecidos:
+O scanner irá ler `entrada.txt` e imprimir os tokens reconhecidos, por exemplo:
 
 ```
 INT(3)
@@ -80,9 +85,8 @@ RPAREN
 
 ---
 
-## Passo 4: Customizações (opcional)
+## Passo 5: Customizações (opcional)
 
-* **Ignorar espaços**: já incluído no scanner gerado.
 * **Ignorar letras/variáveis não reconhecidas**:
 
 No arquivo `Calc.flex`, adicione:
@@ -103,6 +107,7 @@ No arquivo `Calc.flex`, adicione:
 
 * Sempre que modificar o `.flex`, **gere novamente o scanner** com JFlex antes de compilar.
 * Para compatibilidade, execute com **Java 1.9**, pois versões mais novas podem ter problemas com a sintaxe do scanner antigo.
+* O programa agora lê diretamente do arquivo `entrada.txt` e encerra normalmente após processar a expressão.
 
 ---
 
