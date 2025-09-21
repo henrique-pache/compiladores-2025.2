@@ -6,11 +6,12 @@ cd minijava
 
 Compilar
 ```
-javac -d lexer/out -cp out lexer/Scanner.java
-javac -d lexer/out -cp out Main.java
+javac -d out -cp out lexer/Token.java
+javac -d out -cp out lexer/Scanner.java
+javac -d out -cp out Main.java
 ```
 
 Executar
 ```
-java -cp lexer/out minijava.Main
+java -cp out minijava.Main
 ```
