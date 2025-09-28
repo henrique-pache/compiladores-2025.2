@@ -1,0 +1,17 @@
+class ControlFlow {
+    public static void main(String[] args) {
+        int a;
+        int b;
+        a = 1;
+        b = 5;
+        if (a < b) {
+            System.out.println(b - a);
+        } else {
+            System.out.println(a - b);
+        }
+        while (a < b) {
+            System.out.println(a * b);
+            a = a + 1;
+        }
+    }
+}

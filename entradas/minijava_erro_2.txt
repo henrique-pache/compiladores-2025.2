@@ -1,0 +1,7 @@
+class AnotherError {
+    public static void main(String[] args) {
+        boolean test;
+        test = true || false; // Invalid operator '||'
+        integer x = 10; // Invalid keyword 'integer'
+    }
+}

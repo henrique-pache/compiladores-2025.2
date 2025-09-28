@@ -1,0 +1,17 @@
+class Math {
+    public static void main(String[] args) {
+        System.out.println(new Gcd().computeGcd(48, 18));
+    }
+}
+
+class Gcd {
+    public int computeGcd(int a, int b) {
+        int temp;
+        while (b != 0) {
+            temp = b;
+            b = a - (a / b) * b; // Implementação do operador modulo (%)
+            a = temp;
+        }
+        return a;
+    }
+}
