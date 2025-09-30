@@ -1,5 +1,7 @@
 /* Calc.flex - Scanner para uma calculadora simples usando JFlex 1.9 */
 
+package calculadora;
+
 %%
 
 %class CalcScanner

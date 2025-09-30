@@ -3,7 +3,7 @@ import java.io.FileReader;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        FileReader reader = new FileReader("entrada/entrada.txt");
+        FileReader reader = new FileReader("calculadora/entradas/entrada.txt");
         CalcScanner scanner = new CalcScanner(reader);
 
         while (!scanner.yyatEOF()) {
