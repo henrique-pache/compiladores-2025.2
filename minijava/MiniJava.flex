@@ -23,10 +23,16 @@ WHITESPACE = [ \t\r\n]+
 /* Números inteiros */
 INTEGER    = [0-9]+
 
+/* Comentários */
+COMMENT_LINE = "//"[^\r\n]*
+COMMENT_BLOCK = "/*"([^*]|"*"[^/])*"*/"
+
 %%
 
-/* Espaços em branco - ignorar */
+/* Espaços em branco e comentários - ignorar */
 {WHITESPACE}       {}
+{COMMENT_LINE}     {}
+{COMMENT_BLOCK}    {}
 
 /* Palavras reservadas */
 "class"            { System.out.println("RESERVADA, class"); }
@@ -46,10 +52,10 @@ INTEGER    = [0-9]+
 "false"            { System.out.println("RESERVADA, false"); }
 "this"             { System.out.println("RESERVADA, this"); }
 "new"              { System.out.println("RESERVADA, new"); }
-"System"           { System.out.println("RESERVADA, System"); }
-"out"              { System.out.println("RESERVADA, out"); }
-"println"          { System.out.println("RESERVADA, println"); }
-"package"          { System.out.println("RESERVADA, package"); }
+"length"           { System.out.println("RESERVADA, length"); }
+
+/* System.out.println como token único */
+"System.out.println" { System.out.println("RESERVADA, System.out.println"); }
 
 /* Números inteiros */
 {INTEGER}          { System.out.println("NUMERO, " + yytext()); }
@@ -86,4 +92,10 @@ INTEGER    = [0-9]+
 <<EOF>>            { System.out.println("EOF"); return; }
 
 /* Qualquer outro caractere → erro */
-.                  { System.out.println("ERRO(" + yytext() + ")"); }
+.                  { 
+                     throw new RuntimeException(
+                         "ERRO: caractere não reconhecido '" + yytext() + 
+                         "' na linha " + (yyline + 1) + 
+                         ", coluna " + (yycolumn + 1)
+                     ); 
+                   }
