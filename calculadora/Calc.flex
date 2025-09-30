@@ -35,5 +35,14 @@ FLOAT       = {DIGITO}+ "." {DIGITO}+
 /* Ignorar espaços em branco */
 [ \t\r\n]+  { /* ignora */ }
 
+/* EOF */
+<<EOF>>            { System.out.println("EOF"); return; }
+
 /* Qualquer outro caractere → erro */
-.           { System.out.println("ERRO(" + yytext() + ")"); }
+.                  { 
+                     throw new RuntimeException(
+                         "ERRO: caractere não reconhecido '" + yytext() + 
+                         "' na linha " + (yyline + 1) + 
+                         ", coluna " + (yycolumn + 1)
+                     ); 
+                   }
