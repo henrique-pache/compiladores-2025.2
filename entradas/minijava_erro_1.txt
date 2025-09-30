@@ -1,0 +1,5 @@
+class Error {
+    // Invalid characters below
+    int a = @;
+    int b = #;
+}
