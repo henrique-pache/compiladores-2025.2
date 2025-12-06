@@ -1,7 +1,11 @@
-# jflex-1.9.1/
-# jflex-1.9.1/*
+jflex-1.9.1
+jflex-1.9.1/*
+
+*.class
 
 # jflex-full-1.9.1.jar
+java-cup-11b.jar
+java-cup-11b-runtime.jar
 
 minijava/Entrada.class
 minijava/Main.class
