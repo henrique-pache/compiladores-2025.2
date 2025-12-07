@@ -8,7 +8,7 @@ import java_cup.runtime.*;
 %%
 
 %public
-%class MiniJavaScanner
+%class Lexer
 %unicode
 %line
 %column
@@ -72,7 +72,7 @@ COMMENT_BLOCK = "/*"([^*]|"*"[^/])*"*/"
 "System.out.println" { return symbol(sym.SYSTEM_OUT_PRINTLN); }
 
 /* Números inteiros */
-{INTEGER}          { return symbol(sym.INTEGER_LITERAL, new Integer(yytext())); }
+{INTEGER}          { return symbol(sym.INTEGER_LITERAL, Integer.parseInt(yytext())); }
 
 /* Identificadores */
 {ID_START}{ID_PART}* { return symbol(sym.IDENTIFIER, yytext()); }
@@ -84,6 +84,7 @@ COMMENT_BLOCK = "/*"([^*]|"*"[^/])*"*/"
 "<="               { return symbol(sym.LEQ); }
 ">="               { return symbol(sym.GEQ); }
 "<"                { return symbol(sym.LT); }
+">"                { return symbol(sym.GT); }
 "="                { return symbol(sym.ASSIGN); }
 "!"                { return symbol(sym.NOT); }
 "+"                { return symbol(sym.PLUS); }
@@ -101,6 +102,8 @@ COMMENT_BLOCK = "/*"([^*]|"*"[^/])*"*/"
 "."                { return symbol(sym.DOT); }
 ","                { return symbol(sym.COMMA); }
 ";"                { return symbol(sym.SEMICOLON); }
+
+
 
 /* EOF */
 <<EOF>>            { return null; }

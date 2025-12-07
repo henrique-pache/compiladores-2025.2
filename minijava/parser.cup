@@ -1,0 +1,190 @@
+package minijava;
+
+import java_cup.runtime.*;
+
+/* Código do parser para tratamento de erros (opcional, mas recomendado) */
+parser code {:
+    // Reportar erros de sintaxe de forma simples
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Erro de Sintaxe");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                m.append(" na linha " + (s.left+1));
+                if (s.right >= 0)
+                    m.append(", coluna " + (s.right+1));
+            }
+        }
+        m.append(" : " + message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+
+    
+:};
+
+
+
+/* ==================================================================
+   DECLARAÇÃO DE TERMINAIS (TOKENS DO FLEX)
+   ================================================================== */
+
+/* Palavras reservadas e símbolos sem valor associado */
+terminal CLASS, PUBLIC, STATIC, VOID, MAIN, STRING;
+terminal EXTENDS, RETURN;
+terminal INT, BOOLEAN;
+terminal IF, ELSE, WHILE;
+terminal TRUE, FALSE, THIS, NEW, LENGTH;
+terminal SYSTEM_OUT_PRINTLN; // Token específico do seu Flex
+
+/* Operadores e Delimitadores */
+terminal AND, EQ_EQ, NOT_EQ, LEQ, GEQ, LT, GT;
+terminal PLUS, MINUS, TIMES, DIVIDE, ASSIGN, NOT;
+terminal LPAREN, RPAREN, LBRACE, RBRACE, LBRACKET, RBRACKET;
+terminal DOT, COMMA, SEMICOLON;
+
+/* Terminais com valor (conforme definido no seu Flex) */
+terminal Integer INTEGER_LITERAL;
+terminal String  IDENTIFIER;
+
+/* ==================================================================
+   DECLARAÇÃO DE NÃO-TERMINAIS
+   ================================================================== */
+/* Como não temos classes de AST, definimos como Object apenas para validação */
+
+non terminal Object Program;
+non terminal Object MainClass;
+non terminal Object ClassDecl, ClassDeclList;
+non terminal Object VarDecl, VarDeclList;
+non terminal Object MethodDecl, MethodDeclList;
+non terminal Object FormalList, FormalRest;
+non terminal Object Type;
+non terminal Object Statement, StatementList;
+non terminal Object Expression, ExpressionList, ExpressionRest;
+
+/* ==================================================================
+   PRECEDÊNCIA E ASSOCIATIVIDADE
+   (Ordem do menor para o maior)
+   ================================================================== */
+
+precedence right ASSIGN;
+precedence left  AND;
+precedence left  EQ_EQ, NOT_EQ;
+precedence left  LT, GT, LEQ, GEQ;
+precedence left  PLUS, MINUS;
+precedence left  TIMES, DIVIDE;
+precedence right NOT; 
+precedence left  DOT, LBRACKET, LPAREN; 
+
+/* ==================================================================
+   REGRAS DA GRAMÁTICA (PRODUÇÕES)
+   ================================================================== */
+
+start with Program;
+
+/* Um programa MiniJava consiste na MainClass seguida por outras classes */
+Program ::= MainClass ClassDeclList;
+
+/* Classe Principal */
+MainClass ::= CLASS IDENTIFIER LBRACE 
+              PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET IDENTIFIER RPAREN LBRACE 
+              VarDeclList
+              StatementList
+              RBRACE 
+              RBRACE;
+
+/* Lista de Declaração de Classes */
+ClassDeclList ::= ClassDeclList ClassDecl
+                | /* vazio */
+                ;
+
+/* Declaração de uma Classe */
+ClassDecl ::= CLASS IDENTIFIER LBRACE VarDeclList MethodDeclList RBRACE
+            | CLASS IDENTIFIER EXTENDS IDENTIFIER LBRACE VarDeclList MethodDeclList RBRACE
+            ;
+
+/* Listas de Variáveis e Métodos */
+VarDeclList ::= VarDeclList VarDecl
+              | /* vazio */
+              ;
+
+MethodDeclList ::= MethodDeclList MethodDecl
+                 | /* vazio */
+                 ;
+
+/* Declaração de Variável */
+VarDecl ::= Type IDENTIFIER SEMICOLON;
+
+/* Declaração de Método */
+MethodDecl ::= PUBLIC Type IDENTIFIER LPAREN FormalList RPAREN LBRACE 
+               VarDeclList StatementList RETURN Expression SEMICOLON 
+               RBRACE;
+
+/* Parâmetros Formais */
+FormalList ::= Type IDENTIFIER FormalRest
+             | /* vazio */
+             ;
+
+FormalRest ::= FormalRest COMMA Type IDENTIFIER
+             | /* vazio */
+             ;
+
+/* Tipos Suportados */
+Type ::= INT LBRACKET RBRACKET  /* int[] */
+       | BOOLEAN
+       | INT
+       | IDENTIFIER             /* Tipo objeto */
+       ;
+
+/* Lista de Statements */
+StatementList ::= Statement StatementList
+                | /* vazio */
+                ;
+
+/* Comandos (Statements) */
+Statement ::= LBRACE StatementList RBRACE
+            | IF LPAREN Expression RPAREN Statement ELSE Statement
+            | WHILE LPAREN Expression RPAREN Statement
+            | SYSTEM_OUT_PRINTLN LPAREN Expression RPAREN SEMICOLON
+            | IDENTIFIER ASSIGN Expression SEMICOLON
+            | IDENTIFIER LBRACKET Expression RBRACKET ASSIGN Expression SEMICOLON
+            ;
+
+/* Expressões */
+Expression ::= Expression AND Expression
+             | Expression EQ_EQ Expression
+             | Expression NOT_EQ Expression
+             | Expression LT Expression
+             | Expression GT Expression
+             | Expression LEQ Expression
+             | Expression GEQ Expression
+             | Expression PLUS Expression
+             | Expression MINUS Expression
+             | Expression TIMES Expression
+             | Expression DIVIDE Expression
+             | Expression LBRACKET Expression RBRACKET
+             | Expression DOT LENGTH
+             | Expression DOT IDENTIFIER LPAREN ExpressionList RPAREN /* Chamada de método */
+             | INTEGER_LITERAL
+             | TRUE
+             | FALSE
+             | IDENTIFIER
+             | THIS
+             | NEW INT LBRACKET Expression RBRACKET
+             | NEW IDENTIFIER LPAREN RPAREN
+             | NOT Expression
+             | LPAREN Expression RPAREN
+             ;
+
+/* Lista de Expressões (Argumentos) */
+ExpressionList ::= Expression ExpressionRest
+                 | /* vazio */
+                 ;
+
+ExpressionRest ::= ExpressionRest COMMA Expression
+                 | /* vazio */
+                 ;
