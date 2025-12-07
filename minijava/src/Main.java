@@ -10,7 +10,7 @@ public class Main {
         try {
             // Lê o conteúdo do arquivo como String
             String codigo = new String(
-                Files.readAllBytes(Paths.get("entradas/minijava_ok_5.txt"))
+                Files.readAllBytes(Paths.get("entradas/minijava_erro_2.txt"))
             );
 
             System.out.println("=== CÓDIGO FONTE ===");
@@ -36,16 +36,26 @@ public class Main {
             Parser parser = new Parser(scanner, new java_cup.runtime.DefaultSymbolFactory());
             try {
                 Symbol result = parser.parse();
-                System.out.println(result);
                 System.out.println("\n✓ Parse realizado com SUCESSO!");
-                if (result != null && result.value != null) {
-                    System.out.println("Resultado: " + result.value);
+                
+                // Debug: verificar o conteúdo do result
+                System.out.println("DEBUG: result = " + result);
+                System.out.println("DEBUG: result.value = " + result.value);
+                if (result.value != null) {
+                    System.out.println("DEBUG: result.value.getClass() = " + result.value.getClass());
+                }
+                
+                if (result != null && result.value != null && result.value instanceof ASTNode) {
+                    System.out.println("\n=== ÁRVORE DE ANÁLISE SINTÁTICA ===");
+                    ASTNode ast = (ASTNode) result.value;
+                    ast.print(0);
+                } else {
+                    System.out.println("\nNOTA: A AST não foi construída. Verifique o arquivo .cup para garantir que as ações semânticas retornam ASTNode.");
                 }
             } catch (Exception e) {
                 System.out.println("\n✗ Erro durante o parsing: " + e.getMessage());
                 e.printStackTrace();
             }
-
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
             e.printStackTrace();

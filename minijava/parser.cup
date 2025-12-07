@@ -2,6 +2,7 @@ package minijava;
 
 import java_cup.runtime.*;
 
+
 /* Código do parser para tratamento de erros (opcional, mas recomendado) */
 parser code {:
     // Reportar erros de sintaxe de forma simples
@@ -54,17 +55,17 @@ terminal String  IDENTIFIER;
 /* ==================================================================
    DECLARAÇÃO DE NÃO-TERMINAIS
    ================================================================== */
-/* Como não temos classes de AST, definimos como Object apenas para validação */
+/* Agora definimos como ASTNode para construir a árvore */
 
-non terminal Object Program;
-non terminal Object MainClass;
-non terminal Object ClassDecl, ClassDeclList;
-non terminal Object VarDecl, VarDeclList;
-non terminal Object MethodDecl, MethodDeclList;
-non terminal Object FormalList, FormalRest;
-non terminal Object Type;
-non terminal Object Statement, StatementList;
-non terminal Object Expression, ExpressionList, ExpressionRest;
+non terminal ASTNode Program;
+non terminal ASTNode MainClass;
+non terminal ASTNode ClassDecl, ClassDeclList;
+non terminal ASTNode VarDecl, VarDeclList;
+non terminal ASTNode MethodDecl, MethodDeclList;
+non terminal ASTNode FormalList, FormalRest;
+non terminal ASTNode Type;
+non terminal ASTNode Statement, StatementList;
+non terminal ASTNode Expression, ExpressionList, ExpressionRest;
 
 /* ==================================================================
    PRECEDÊNCIA E ASSOCIATIVIDADE
@@ -87,104 +88,356 @@ precedence left  DOT, LBRACKET, LPAREN;
 start with Program;
 
 /* Um programa MiniJava consiste na MainClass seguida por outras classes */
-Program ::= MainClass ClassDeclList;
+Program ::= MainClass:m ClassDeclList:c
+            {: 
+                ASTNode node = new ASTNode("Program");
+                node.addChild(m);
+                node.addChild(c);
+                RESULT = node;
+            :};
 
 /* Classe Principal */
-MainClass ::= CLASS IDENTIFIER LBRACE 
-              PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET IDENTIFIER RPAREN LBRACE 
-              VarDeclList
-              StatementList
+MainClass ::= CLASS IDENTIFIER:id LBRACE 
+              PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET IDENTIFIER:arg RPAREN LBRACE 
+              VarDeclList:vars
+              StatementList:stmts
               RBRACE 
-              RBRACE;
+              RBRACE
+            {:
+                ASTNode node = new ASTNode("MainClass", id);
+                node.addChild(new ASTNode("MainArg", arg));
+                node.addChild(vars);
+                node.addChild(stmts);
+                RESULT = node;
+            :};
 
 /* Lista de Declaração de Classes */
-ClassDeclList ::= ClassDeclList ClassDecl
+ClassDeclList ::= ClassDeclList:list ClassDecl:decl
+                {:
+                    list.addChild(decl);
+                    RESULT = list;
+                :}
                 | /* vazio */
+                {:
+                    RESULT = new ASTNode("ClassDeclList");
+                :}
                 ;
 
 /* Declaração de uma Classe */
-ClassDecl ::= CLASS IDENTIFIER LBRACE VarDeclList MethodDeclList RBRACE
-            | CLASS IDENTIFIER EXTENDS IDENTIFIER LBRACE VarDeclList MethodDeclList RBRACE
+ClassDecl ::= CLASS IDENTIFIER:id LBRACE VarDeclList:vars MethodDeclList:methods RBRACE
+            {:
+                ASTNode node = new ASTNode("ClassDecl", id);
+                node.addChild(vars);
+                node.addChild(methods);
+                RESULT = node;
+            :}
+            | CLASS IDENTIFIER:id EXTENDS IDENTIFIER:parent LBRACE VarDeclList:vars MethodDeclList:methods RBRACE
+            {:
+                ASTNode node = new ASTNode("ClassDecl", id);
+                node.addChild(new ASTNode("Extends", parent));
+                node.addChild(vars);
+                node.addChild(methods);
+                RESULT = node;
+            :}
             ;
 
 /* Listas de Variáveis e Métodos */
-VarDeclList ::= VarDeclList VarDecl
+VarDeclList ::= VarDeclList:list VarDecl:decl
+              {:
+                  list.addChild(decl);
+                  RESULT = list;
+              :}
               | /* vazio */
+              {:
+                  RESULT = new ASTNode("VarDeclList");
+              :}
               ;
 
-MethodDeclList ::= MethodDeclList MethodDecl
+MethodDeclList ::= MethodDeclList:list MethodDecl:decl
+                 {:
+                     list.addChild(decl);
+                     RESULT = list;
+                 :}
                  | /* vazio */
+                 {:
+                     RESULT = new ASTNode("MethodDeclList");
+                 :}
                  ;
 
 /* Declaração de Variável */
-VarDecl ::= Type IDENTIFIER SEMICOLON;
+VarDecl ::= Type:t IDENTIFIER:id SEMICOLON
+            {:
+                ASTNode node = new ASTNode("VarDecl", id);
+                node.addChild(t);
+                RESULT = node;
+            :};
 
 /* Declaração de Método */
-MethodDecl ::= PUBLIC Type IDENTIFIER LPAREN FormalList RPAREN LBRACE 
-               VarDeclList StatementList RETURN Expression SEMICOLON 
-               RBRACE;
+MethodDecl ::= PUBLIC Type:t IDENTIFIER:id LPAREN FormalList:params RPAREN LBRACE 
+               VarDeclList:vars StatementList:stmts RETURN Expression:ret SEMICOLON 
+               RBRACE
+            {:
+                ASTNode node = new ASTNode("MethodDecl", id);
+                node.addChild(t);
+                node.addChild(params);
+                node.addChild(vars);
+                node.addChild(stmts);
+                ASTNode returnNode = new ASTNode("Return");
+                returnNode.addChild(ret);
+                node.addChild(returnNode);
+                RESULT = node;
+            :};
 
 /* Parâmetros Formais */
-FormalList ::= Type IDENTIFIER FormalRest
+FormalList ::= Type:t IDENTIFIER:id FormalRest:rest
+             {:
+                 ASTNode node = new ASTNode("FormalList");
+                 ASTNode param = new ASTNode("Param", id);
+                 param.addChild(t);
+                 node.addChild(param);
+                 if (rest != null) {
+                     for (ASTNode child : rest.getChildren()) {
+                         node.addChild(child);
+                     }
+                 }
+                 RESULT = node;
+             :}
              | /* vazio */
+             {:
+                 RESULT = new ASTNode("FormalList");
+             :}
              ;
 
-FormalRest ::= FormalRest COMMA Type IDENTIFIER
+FormalRest ::= FormalRest:rest COMMA Type:t IDENTIFIER:id
+             {:
+                 ASTNode param = new ASTNode("Param", id);
+                 param.addChild(t);
+                 rest.addChild(param);
+                 RESULT = rest;
+             :}
              | /* vazio */
+             {:
+                 RESULT = new ASTNode("FormalRest");
+             :}
              ;
 
 /* Tipos Suportados */
-Type ::= INT LBRACKET RBRACKET  /* int[] */
+Type ::= INT LBRACKET RBRACKET
+       {: RESULT = new ASTNode("Type", "int[]"); :}
        | BOOLEAN
+       {: RESULT = new ASTNode("Type", "boolean"); :}
        | INT
-       | IDENTIFIER             /* Tipo objeto */
+       {: RESULT = new ASTNode("Type", "int"); :}
+       | IDENTIFIER:id
+       {: RESULT = new ASTNode("Type", id); :}
        ;
 
 /* Lista de Statements */
-StatementList ::= Statement StatementList
+StatementList ::= Statement:s StatementList:list
+                {:
+                    ASTNode node = new ASTNode("StatementList");
+                    node.addChild(s);
+                    for (ASTNode child : list.getChildren()) {
+                        node.addChild(child);
+                    }
+                    RESULT = node;
+                :}
                 | /* vazio */
+                {:
+                    RESULT = new ASTNode("StatementList");
+                :}
                 ;
 
 /* Comandos (Statements) */
-Statement ::= LBRACE StatementList RBRACE
-            | IF LPAREN Expression RPAREN Statement ELSE Statement
-            | WHILE LPAREN Expression RPAREN Statement
-            | SYSTEM_OUT_PRINTLN LPAREN Expression RPAREN SEMICOLON
-            | IDENTIFIER ASSIGN Expression SEMICOLON
-            | IDENTIFIER LBRACKET Expression RBRACKET ASSIGN Expression SEMICOLON
+Statement ::= LBRACE StatementList:stmts RBRACE
+            {: RESULT = stmts; :}
+            | IF LPAREN Expression:cond RPAREN Statement:thenStmt ELSE Statement:elseStmt
+            {:
+                ASTNode node = new ASTNode("If");
+                node.addChild(cond);
+                node.addChild(thenStmt);
+                node.addChild(elseStmt);
+                RESULT = node;
+            :}
+            | WHILE LPAREN Expression:cond RPAREN Statement:body
+            {:
+                ASTNode node = new ASTNode("While");
+                node.addChild(cond);
+                node.addChild(body);
+                RESULT = node;
+            :}
+            | SYSTEM_OUT_PRINTLN LPAREN Expression:expr RPAREN SEMICOLON
+            {:
+                ASTNode node = new ASTNode("PrintLn");
+                node.addChild(expr);
+                RESULT = node;
+            :}
+            | IDENTIFIER:id ASSIGN Expression:expr SEMICOLON
+            {:
+                ASTNode node = new ASTNode("Assign", id);
+                node.addChild(expr);
+                RESULT = node;
+            :}
+            | IDENTIFIER:id LBRACKET Expression:idx RBRACKET ASSIGN Expression:expr SEMICOLON
+            {:
+                ASTNode node = new ASTNode("ArrayAssign", id);
+                node.addChild(idx);
+                node.addChild(expr);
+                RESULT = node;
+            :}
             ;
 
 /* Expressões */
-Expression ::= Expression AND Expression
-             | Expression EQ_EQ Expression
-             | Expression NOT_EQ Expression
-             | Expression LT Expression
-             | Expression GT Expression
-             | Expression LEQ Expression
-             | Expression GEQ Expression
-             | Expression PLUS Expression
-             | Expression MINUS Expression
-             | Expression TIMES Expression
-             | Expression DIVIDE Expression
-             | Expression LBRACKET Expression RBRACKET
-             | Expression DOT LENGTH
-             | Expression DOT IDENTIFIER LPAREN ExpressionList RPAREN /* Chamada de método */
-             | INTEGER_LITERAL
+Expression ::= Expression:e1 AND Expression:e2
+             {: 
+                 ASTNode node = new ASTNode("And");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 EQ_EQ Expression:e2
+             {:
+                 ASTNode node = new ASTNode("Equal");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 NOT_EQ Expression:e2
+             {:
+                 ASTNode node = new ASTNode("NotEqual");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 LT Expression:e2
+             {:
+                 ASTNode node = new ASTNode("LessThan");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 GT Expression:e2
+             {:
+                 ASTNode node = new ASTNode("GreaterThan");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 LEQ Expression:e2
+             {:
+                 ASTNode node = new ASTNode("LessEqual");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 GEQ Expression:e2
+             {:
+                 ASTNode node = new ASTNode("GreaterEqual");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 PLUS Expression:e2
+             {:
+                 ASTNode node = new ASTNode("Plus");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 MINUS Expression:e2
+             {:
+                 ASTNode node = new ASTNode("Minus");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 TIMES Expression:e2
+             {:
+                 ASTNode node = new ASTNode("Times");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:e1 DIVIDE Expression:e2
+             {:
+                 ASTNode node = new ASTNode("Divide");
+                 node.addChild(e1);
+                 node.addChild(e2);
+                 RESULT = node;
+             :}
+             | Expression:arr LBRACKET Expression:idx RBRACKET
+             {:
+                 ASTNode node = new ASTNode("ArrayAccess");
+                 node.addChild(arr);
+                 node.addChild(idx);
+                 RESULT = node;
+             :}
+             | Expression:obj DOT LENGTH
+             {:
+                 ASTNode node = new ASTNode("Length");
+                 node.addChild(obj);
+                 RESULT = node;
+             :}
+             | Expression:obj DOT IDENTIFIER:method LPAREN ExpressionList:args RPAREN
+             {:
+                 ASTNode node = new ASTNode("MethodCall", method);
+                 node.addChild(obj);
+                 node.addChild(args);
+                 RESULT = node;
+             :}
+             | INTEGER_LITERAL:val
+             {: RESULT = new ASTNode("IntLiteral", val); :}
              | TRUE
+             {: RESULT = new ASTNode("BoolLiteral", true); :}
              | FALSE
-             | IDENTIFIER
+             {: RESULT = new ASTNode("BoolLiteral", false); :}
+             | IDENTIFIER:id
+             {: RESULT = new ASTNode("Identifier", id); :}
              | THIS
-             | NEW INT LBRACKET Expression RBRACKET
-             | NEW IDENTIFIER LPAREN RPAREN
-             | NOT Expression
-             | LPAREN Expression RPAREN
+             {: RESULT = new ASTNode("This"); :}
+             | NEW INT LBRACKET Expression:size RBRACKET
+             {:
+                 ASTNode node = new ASTNode("NewIntArray");
+                 node.addChild(size);
+                 RESULT = node;
+             :}
+             | NEW IDENTIFIER:id LPAREN RPAREN
+             {: RESULT = new ASTNode("NewObject", id); :}
+             | NOT Expression:e
+             {:
+                 ASTNode node = new ASTNode("Not");
+                 node.addChild(e);
+                 RESULT = node;
+             :}
+             | LPAREN Expression:e RPAREN
+             {: RESULT = e; :}
              ;
 
 /* Lista de Expressões (Argumentos) */
-ExpressionList ::= Expression ExpressionRest
+ExpressionList ::= Expression:e ExpressionRest:rest
+                 {:
+                     ASTNode node = new ASTNode("ExpressionList");
+                     node.addChild(e);
+                     if (rest != null) {
+                         for (ASTNode child : rest.getChildren()) {
+                             node.addChild(child);
+                         }
+                     }
+                     RESULT = node;
+                 :}
                  | /* vazio */
+                 {:
+                     RESULT = new ASTNode("ExpressionList");
+                 :}
                  ;
 
-ExpressionRest ::= ExpressionRest COMMA Expression
+ExpressionRest ::= ExpressionRest:rest COMMA Expression:e
+                 {:
+                     rest.addChild(e);
+                     RESULT = rest;
+                 :}
                  | /* vazio */
+                 {:
+                     RESULT = new ASTNode("ExpressionRest");
+                 :}
                  ;
