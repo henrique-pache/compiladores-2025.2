@@ -1,5 +1,8 @@
 package minijava;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,9 +12,8 @@ public class Main {
     public static void main(String[] args) {
         try {
             // Lê o conteúdo do arquivo como String
-            String codigo = new String(
-                Files.readAllBytes(Paths.get("entradas/minijava_erro_2.txt"))
-            );
+           BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+           String codigo = br.lines().collect(Collectors.joining("\n"));
 
             System.out.println("=== CÓDIGO FONTE ===");
             System.out.println(codigo);

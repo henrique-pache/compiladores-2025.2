@@ -1,5 +1,6 @@
 jflex-1.9.1
 jflex-1.9.1/*
+jar/*
 
 *.class
 minijava/src/*
