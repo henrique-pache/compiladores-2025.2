@@ -2,8 +2,10 @@
 REM Ir para a pasta do script
 cd /d "%~dp0"
 
-REM Compila tudo (ajuste se seu run.bat já faz isso)
+REM Compila tudo 
 call run.bat
+
+pause
 
 echo.
 echo ===========================================

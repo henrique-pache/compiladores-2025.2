@@ -36,14 +36,5 @@ if errorlevel 1 (
 echo Compilacao realizada com sucesso!
 echo.
 
-echo Executando...
-::java -cp "..\jar\java-cup-11b-runtime.jar;src" minijava.Main
+echo  Para executar aperte Enter...
 
-pause
-
-::del src\*.class 2>nul
-::del src\minijava\*.class 2>nul
-::del src\Lexer.java 2>nul
-::del src\Parser.java 2>nul
-::del src\sym.java 2>nul
-::del src\minijava\ASTNode.java 2>nul
