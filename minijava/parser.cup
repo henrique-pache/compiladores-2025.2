@@ -3,7 +3,7 @@ package minijava;
 import java_cup.runtime.*;
 
 
-/* Código do parser para tratamento de erros (opcional, mas recomendado) */
+/* Código do parser para tratamento de erros */
 parser code {:
     // Reportar erros de sintaxe de forma simples
     public void report_error(String message, Object info) {
@@ -40,7 +40,7 @@ terminal EXTENDS, RETURN;
 terminal INT, BOOLEAN;
 terminal IF, ELSE, WHILE;
 terminal TRUE, FALSE, THIS, NEW, LENGTH;
-terminal SYSTEM_OUT_PRINTLN; // Token específico do seu Flex
+terminal SYSTEM_OUT_PRINTLN; 
 
 /* Operadores e Delimitadores */
 terminal AND, EQ_EQ, NOT_EQ, LEQ, GEQ, LT, GT;
@@ -48,7 +48,7 @@ terminal PLUS, MINUS, TIMES, DIVIDE, ASSIGN, NOT;
 terminal LPAREN, RPAREN, LBRACE, RBRACE, LBRACKET, RBRACKET;
 terminal DOT, COMMA, SEMICOLON;
 
-/* Terminais com valor (conforme definido no seu Flex) */
+/* Terminais com valor */
 terminal Integer INTEGER_LITERAL;
 terminal String  IDENTIFIER;
 
