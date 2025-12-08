@@ -41,8 +41,8 @@ public class Main {
                 System.out.println("\n✓ Parse realizado com SUCESSO!");
                 
                 // Debug: verificar o conteúdo do result
-                System.out.println("DEBUG: result = " + result);
-                System.out.println("DEBUG: result.value = " + result.value);
+                //System.out.println("DEBUG: result = " + result);
+                //System.out.println("DEBUG: result.value = " + result.value);
                 if (result.value != null) {
                     System.out.println("DEBUG: result.value.getClass() = " + result.value.getClass());
                 }
