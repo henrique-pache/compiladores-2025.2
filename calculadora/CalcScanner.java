@@ -93,10 +93,10 @@ public final class CalcScanner {
 
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
-    "\1\10\1\11\1\12\1\13\1\0\1\14";
+    "\1\10\1\11\1\0\1\12";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[14];
+    int [] result = new int[12];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -121,11 +121,11 @@ public final class CalcScanner {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\13\0\26\0\13\0\13\0\41\0\13\0\13"+
-    "\0\54\0\67\0\13\0\13\0\102\0\102";
+    "\0\0\0\13\0\26\0\13\0\13\0\13\0\13\0\13"+
+    "\0\13\0\41\0\54\0\54";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[14];
+    int [] result = new int[12];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -149,11 +149,11 @@ public final class CalcScanner {
 
   private static final String ZZ_TRANS_PACKED_0 =
     "\1\2\1\3\1\0\1\4\1\5\1\6\1\7\1\10"+
-    "\1\2\1\11\1\12\14\0\1\3\16\0\1\13\16\0"+
-    "\1\14\11\0\1\15\1\0\1\12\12\0\1\16";
+    "\1\2\1\11\1\12\14\0\1\3\21\0\1\13\1\0"+
+    "\1\12\12\0\1\14";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[77];
+    int [] result = new int[55];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -196,11 +196,10 @@ public final class CalcScanner {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\1\1\2\11\1\1\2\11\2\1\2\11"+
-    "\1\0\1\1";
+    "\1\0\1\11\1\1\6\11\1\1\1\0\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[14];
+    int [] result = new int[12];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -698,62 +697,52 @@ public final class CalcScanner {
                      );
             }
           // fall through
-          case 13: break;
+          case 11: break;
           case 2:
             { /* ignora */
             }
           // fall through
-          case 14: break;
+          case 12: break;
           case 3:
             { System.out.println("LPAREN");
             }
           // fall through
-          case 15: break;
+          case 13: break;
           case 4:
             { System.out.println("RPAREN");
             }
           // fall through
-          case 16: break;
+          case 14: break;
           case 5:
             { System.out.println("TIMES");
             }
           // fall through
-          case 17: break;
+          case 15: break;
           case 6:
             { System.out.println("PLUS");
             }
           // fall through
-          case 18: break;
+          case 16: break;
           case 7:
             { System.out.println("MINUS");
             }
           // fall through
-          case 19: break;
+          case 17: break;
           case 8:
             { System.out.println("DIV");
             }
           // fall through
-          case 20: break;
+          case 18: break;
           case 9:
             { System.out.println("INT(" + yytext() + ")");
             }
           // fall through
-          case 21: break;
+          case 19: break;
           case 10:
-            { System.out.println("POW");
-            }
-          // fall through
-          case 22: break;
-          case 11:
-            { System.out.println("INTDIV");
-            }
-          // fall through
-          case 23: break;
-          case 12:
             { System.out.println("FLOAT(" + yytext() + ")");
             }
           // fall through
-          case 24: break;
+          case 20: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }
