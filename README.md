@@ -85,11 +85,17 @@ Foi implementado um scanner para a linguagem MiniJava utilizando JFlex. O arquiv
    ```
 
 2. **Linux/Mac:**
-
-   Execute o arquivo `run.sh` localizado no diretório `minijava`:
+   Transforme os arquivos em executáveis
 
    ```bash
-   ./minijava/run.sh
+   chmod +x ./minijava/run.sh
+   chmod +x ./minijava/run-tests.sh
+   ```
+
+   Execute o arquivo `run-tests.sh` localizado no diretório `minijava`:
+
+   ```bash
+   ./minijava/run-tests.sh
    ```
 
 Esses scripts automatizam os passos de geração, compilação e execução do scanner.
