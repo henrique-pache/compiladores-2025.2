@@ -1,17 +1,31 @@
 package minijava;
 
+import java_cup.runtime.*;
+
+
 /* MiniJava.flex - Scanner para MiniJava */
 
 %%
 
 %public
-%class MiniJavaScanner
+%class Lexer
 %unicode
 %line
 %column
 %char
 %final
-%type void
+%cup
+%type Symbol
+
+%{
+    private Symbol symbol(int type) {
+        return new Symbol(type, yyline, yycolumn);
+    }
+
+    private Symbol symbol(int type, Object value) {
+        return new Symbol(type, yyline, yycolumn, value);
+    }
+%}
 
 /* Identificadores */
 ID_START   = [A-Za-z_]
@@ -35,61 +49,64 @@ COMMENT_BLOCK = "/*"([^*]|"*"[^/])*"*/"
 {COMMENT_BLOCK}    {}
 
 /* Palavras reservadas */
-"class"            { System.out.println("RESERVADA, class"); }
-"public"           { System.out.println("RESERVADA, public"); }
-"static"           { System.out.println("RESERVADA, static"); }
-"void"             { System.out.println("RESERVADA, void"); }
-"main"             { System.out.println("RESERVADA, main"); }
-"String"           { System.out.println("RESERVADA, String"); }
-"extends"          { System.out.println("RESERVADA, extends"); }
-"return"           { System.out.println("RESERVADA, return"); }
-"int"              { System.out.println("RESERVADA, int"); }
-"boolean"          { System.out.println("RESERVADA, boolean"); }
-"if"               { System.out.println("RESERVADA, if"); }
-"else"             { System.out.println("RESERVADA, else"); }
-"while"            { System.out.println("RESERVADA, while"); }
-"true"             { System.out.println("RESERVADA, true"); }
-"false"            { System.out.println("RESERVADA, false"); }
-"this"             { System.out.println("RESERVADA, this"); }
-"new"              { System.out.println("RESERVADA, new"); }
-"length"           { System.out.println("RESERVADA, length"); }
+"class"            { return symbol(sym.CLASS); }
+"public"           { return symbol(sym.PUBLIC); }
+"static"           { return symbol(sym.STATIC); }
+"void"             { return symbol(sym.VOID); }
+"main"             { return symbol(sym.MAIN); }
+"String"           { return symbol(sym.STRING); }
+"extends"          { return symbol(sym.EXTENDS); }
+"return"           { return symbol(sym.RETURN); }
+"int"              { return symbol(sym.INT); }
+"boolean"          { return symbol(sym.BOOLEAN); }
+"if"               { return symbol(sym.IF); }
+"else"             { return symbol(sym.ELSE); }
+"while"            { return symbol(sym.WHILE); }
+"true"             { return symbol(sym.TRUE); }
+"false"            { return symbol(sym.FALSE); }
+"this"             { return symbol(sym.THIS); }
+"new"              { return symbol(sym.NEW); }
+"length"           { return symbol(sym.LENGTH); }
 
 /* System.out.println como token único */
-"System.out.println" { System.out.println("RESERVADA, System.out.println"); }
+"System.out.println" { return symbol(sym.SYSTEM_OUT_PRINTLN); }
 
 /* Números inteiros */
-{INTEGER}          { System.out.println("NUMERO, " + yytext()); }
+{INTEGER}          { return symbol(sym.INTEGER_LITERAL, Integer.parseInt(yytext())); }
 
 /* Identificadores */
-{ID_START}{ID_PART}* { System.out.println("ID, " + yytext()); }
+{ID_START}{ID_PART}* { return symbol(sym.IDENTIFIER, yytext()); }
 
 /* Operadores */
-"&&"               { System.out.println("OPERADOR, &&"); }
-"=="               { System.out.println("OPERADOR, =="); }
-"!="               { System.out.println("OPERADOR, !="); }
-"<="               { System.out.println("OPERADOR, <="); }
-">="               { System.out.println("OPERADOR, >="); }
-"<"                { System.out.println("OPERADOR, <"); }
-"="                { System.out.println("OPERADOR, ="); }
-"!"                { System.out.println("OPERADOR, !"); }
-"+"                { System.out.println("OPERADOR, +"); }
-"-"                { System.out.println("OPERADOR, -"); }
-"*"                { System.out.println("OPERADOR, *"); }
-"/"                { System.out.println("OPERADOR, /"); }
+"&&"               { return symbol(sym.AND); }
+"=="               { return symbol(sym.EQ_EQ); }
+"!="               { return symbol(sym.NOT_EQ); }
+"<="               { return symbol(sym.LEQ); }
+">="               { return symbol(sym.GEQ); }
+"<"                { return symbol(sym.LT); }
+">"                { return symbol(sym.GT); }
+"="                { return symbol(sym.ASSIGN); }
+"!"                { return symbol(sym.NOT); }
+"+"                { return symbol(sym.PLUS); }
+"-"                { return symbol(sym.MINUS); }
+"*"                { return symbol(sym.TIMES); }
+"/"                { return symbol(sym.DIVIDE); }
 
 /* Delimitadores */
-"("                { System.out.println("DELIMITADOR, ()"); }
-")"                { System.out.println("DELIMITADOR, ()"); }
-"{"                { System.out.println("DELIMITADOR, {}"); }
-"}"                { System.out.println("DELIMITADOR, {}"); }
-"["                { System.out.println("DELIMITADOR, []"); }
-"]"                { System.out.println("DELIMITADOR, []"); }
-"."                { System.out.println("DELIMITADOR, ."); }
-","                { System.out.println("DELIMITADOR, ,"); }
-";"                { System.out.println("DELIMITADOR, ;"); }
+"("                { return symbol(sym.LPAREN); }
+")"                { return symbol(sym.RPAREN); }
+"{"                { return symbol(sym.LBRACE); }
+"}"                { return symbol(sym.RBRACE); }
+"["                { return symbol(sym.LBRACKET); }
+"]"                { return symbol(sym.RBRACKET); }
+"."                { return symbol(sym.DOT); }
+","                { return symbol(sym.COMMA); }
+";"                { return symbol(sym.SEMICOLON); }
+
+
 
 /* EOF */
-<<EOF>>            { System.out.println("EOF"); return; }
+<<EOF>>            { return null; }
 
 /* Qualquer outro caractere → erro */
 .                  { 

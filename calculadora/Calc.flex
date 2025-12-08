@@ -27,8 +27,6 @@ FLOAT       = {DIGITO}+ "." {DIGITO}+
 ")"         { System.out.println("RPAREN"); }
 "+"         { System.out.println("PLUS"); }
 "-"         { System.out.println("MINUS"); }
-"**"        { System.out.println("POW"); }
-"//"        { System.out.println("INTDIV"); }
 "*"         { System.out.println("TIMES"); }
 "/"         { System.out.println("DIV"); }
 

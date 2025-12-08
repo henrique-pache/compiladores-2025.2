@@ -9,7 +9,7 @@ class Gcd {
         int temp;
         while (b != 0) {
             temp = b;
-            b = a - (a / b) * b; // Implementação do operador modulo (%)
+            b = a - (a / b) * b; // comentario
             a = temp;
         }
         return a;
